@@ -4,6 +4,8 @@ namespace CodeBase.Infrastructure.Services.Network
 {
     public interface INetworkTime
     {
-        public bool TryGetNetworkLocalTime(out TimeSpan time);
+        public void Initialize(string[] ntpServers);
+
+        public bool TryGetNetworkTime(out DateTime time);
     }
 }

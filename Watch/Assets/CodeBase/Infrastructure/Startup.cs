@@ -1,33 +1,50 @@
+using CodeBase.Core.Alarm;
 using CodeBase.Core.Clock;
-using CodeBase.Core.Clock.View;
+using CodeBase.Infrastructure.Services.Loop;
 using CodeBase.Infrastructure.Services.Network;
+using CodeBase.Infrastructure.Services.StateMachine;
+using CodeBase.Infrastructure.Services.StateMachine.Implementations;
+using CodeBase.Infrastructure.States;
 using UnityEngine;
+using Logger = CodeBase.Infrastructure.Services.Log.Logger;
 
 namespace CodeBase.Infrastructure
 {
     public class Startup : MonoBehaviour
     {
-        [SerializeField] private WallClockUIView _wallClockView;
-        [SerializeField] private DigitalClockUIView _digitalClockUIView;
         [SerializeField] private ClockStaticData _clockStaticData;
+        [SerializeField] private ClockSceneData _clockSceneData;
+        [SerializeField] private AlarmSceneData _alarmSceneData;
+        [SerializeField] private ProjectLoop _projectLoop;
 
         private ClockPresenter _clockPresenter;
+        private AlarmPresenter _alarmPresenter;
+        private IStateMachine _stateMachine;
+
+        private void Awake()
+        {
+            var logger = new Logger();
+            var clockModel = new ClockModel(_clockStaticData, new NetworkTime());
+            var alarmModel = new AlarmModel(logger);
+
+            _clockPresenter = new ClockPresenter(clockModel, _clockSceneData);
+            _alarmPresenter = new AlarmPresenter(_clockPresenter, _alarmSceneData, alarmModel);
+            _stateMachine = new StateMachine();
+        }
 
         private void Start()
         {
-            var networkTime = new NetworkTime();
-            var clockModel = new ClockModel(_clockStaticData, networkTime);
+            _alarmSceneData.AlarmToggle.Initialize(_stateMachine);
 
-            _clockPresenter = new ClockPresenter(clockModel, _wallClockView, _digitalClockUIView);
-
-            networkTime.Initialize(_clockStaticData.NtpServers);
-            clockModel.Initialize();
+            InitializeStateMachine();
+            _stateMachine.SwitchTo<ClockState>();
         }
 
-        private void FixedUpdate()
+        private void InitializeStateMachine()
         {
-            _clockPresenter.UpdateModel(Time.fixedDeltaTime);
-            _clockPresenter.UpdateViews();
+            _stateMachine.Initialize(
+                new ClockState(_clockPresenter, _alarmPresenter, _projectLoop),
+                new AlarmState(_alarmPresenter, _projectLoop));
         }
     }
 }

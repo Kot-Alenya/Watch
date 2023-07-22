@@ -19,6 +19,8 @@ namespace CodeBase.Core.Clock
 
         public void Initialize()
         {
+            _networkTime.Initialize(_data.NtpServers);
+
             SetTimeToSynchronization();
             SyncWithNetwork();
         }
@@ -39,13 +41,15 @@ namespace CodeBase.Core.Clock
 
         public TimeSpan GetCurrentTime() => _currentTime;
 
+        public void SetCurrentTime(TimeSpan time) => _currentTime = time;
+
         private void SetTimeToSynchronization() =>
             _timeToSyncWithNetwork = TimeSpan.FromMinutes(_data.TimeToSyncWithNetworkInMinutes);
 
         private void SyncWithNetwork()
         {
-            if (_networkTime.TryGetNetworkLocalTime(out var time))
-                _currentTime = time;
+            if (_networkTime.TryGetNetworkTime(out var time))
+                _currentTime = time.ToLocalTime().TimeOfDay;
         }
     }
 }

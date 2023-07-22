@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CodeBase.Core.Clock.View
 {
-    public class WallClockUIView : MonoBehaviour, IClockView
+    public class WallClockView : MonoBehaviour
     {
         private const float MillisecondsPerSecond = 1000f;
         private const float SecondsPerMinute = 60f;

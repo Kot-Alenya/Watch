@@ -15,4 +15,4 @@ MonoBehaviour:
   _ntpServers:
   - ntp3.ntp-servers.net
   - ntp4.ntp-servers.net
-  _timeToSyncWithNetworkInHours: 1
+  _timeToSyncWithNetworkInMinutes: 60

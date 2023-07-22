@@ -18,7 +18,7 @@ namespace CodeBase.Infrastructure.Services.Network
                 _endPoints[i] = new IPEndPoint(Dns.GetHostEntry(ntpServers[i]).AddressList[0], 123);
         }
 
-        public bool TryGetNetworkLocalTime(out TimeSpan time)
+        public bool TryGetNetworkTime(out DateTime time)
         {
             var milliseconds = 0ul;
             time = default;
@@ -41,8 +41,7 @@ namespace CodeBase.Infrastructure.Services.Network
 
             milliseconds /= (ulong)_endPoints.Length;
 
-            var networkDateTime = new DateTime(1900, 1, 1).AddMilliseconds(milliseconds);
-            time = networkDateTime.ToLocalTime().TimeOfDay;
+            time = new DateTime(1900, 1, 1).AddMilliseconds(milliseconds);
 
             return true;
         }
