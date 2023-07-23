@@ -1,4 +1,5 @@
 ﻿using CodeBase.Core.Alarm;
+using CodeBase.Core.Clock;
 using CodeBase.Infrastructure.Services.Loop;
 using CodeBase.Infrastructure.Services.StateMachine;
 
@@ -6,27 +7,27 @@ namespace CodeBase.Infrastructure.States
 {
     public class AlarmState : IState
     {
-        private readonly AlarmPresenter _presenter;
+        private readonly AlarmPresenter _alarmPresenter;
         private readonly IProjectLoop _loop;
 
-        public AlarmState(AlarmPresenter presenter, IProjectLoop loop)
+        public AlarmState(AlarmPresenter alarmPresenter, IProjectLoop loop)
         {
-            _presenter = presenter;
+            _alarmPresenter = alarmPresenter;
             _loop = loop;
         }
 
         public void Enter()
         {
-            _presenter.Initialize();
+            _alarmPresenter.Initialize();
 
-            _loop.OnUpdate += _presenter.UpdateViews;
+            _loop.OnUpdate += _alarmPresenter.UpdateViews;
         }
 
         public void Exit()
         {
-            _presenter.Dispose();
+            _alarmPresenter.Dispose();
 
-            _loop.OnUpdate -= _presenter.UpdateViews;
+            _loop.OnUpdate -= _alarmPresenter.UpdateViews;
         }
     }
 }

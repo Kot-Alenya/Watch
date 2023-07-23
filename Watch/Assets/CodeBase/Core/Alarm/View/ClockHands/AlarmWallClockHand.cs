@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace CodeBase.Core.Alarm.View.ClockHands
 {
-    public abstract class AlarmWallClockHand : MonoBehaviour, IAlarmView, IDragHandler, IPointerDownHandler
+    public abstract class AlarmWallClockHand : MonoBehaviour, IAlarmView, IDragHandler, IPointerDownHandler,
+        IPointerUpHandler
     {
         [SerializeField] private RectTransform _background;
         private protected AlarmPresenter AlarmPresenter;
@@ -16,10 +18,7 @@ namespace CodeBase.Core.Alarm.View.ClockHands
             _isInitialized = true;
         }
 
-        public void Dispose()
-        {
-            _isInitialized = false;
-        }
+        public void Dispose() => _isInitialized = false;
 
         public void OnPointerDown(PointerEventData eventData)
         {
@@ -36,10 +35,18 @@ namespace CodeBase.Core.Alarm.View.ClockHands
                 return;
 
             if (TryGetPoint(eventData, out var point))
-                OnHandDrag(GetPointAngleDelta(point));
+                AlarmPresenter.SetClockTime(CalculateTime(GetPointAngleDelta(point)));
         }
 
-        private protected abstract void OnHandDrag(float angleDelta);
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            if (!_isInitialized)
+                return;
+            
+            AlarmPresenter.SetAlarm();
+        }
+
+        private protected abstract TimeSpan CalculateTime(float angleDelta);
 
         private bool TryGetPoint(PointerEventData eventData, out Vector2 point) =>
             RectTransformUtility.ScreenPointToLocalPointInRectangle(

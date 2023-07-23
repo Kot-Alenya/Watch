@@ -6,8 +6,12 @@ namespace CodeBase.Core.Alarm
 {
     public class AlarmModel
     {
-        private const string TimeParsePattern = "[0-2]{1}[0-4]{1}" + ":[0-6]{1}[0-9]{1}" + ":[0-6]{1}[0-9]{1}";
+        private const string TimeParsePattern = "[0-9]{2}:[0-9]{2}:[0-9]{2}";
         private const char TimeSplitter = ':';
+        private const int TimeNumbersLength = 8;
+        private const int MaxHoursNumber = 24;
+        private const int MaxHMinutesNumber = 60;
+        private const int MaxSecondsNumber = 60;
 
         private readonly Regex _timeParser;
         private readonly ILogger _logger;
@@ -28,18 +32,42 @@ namespace CodeBase.Core.Alarm
             _timeToAlarm = TimeSpan.MaxValue;
         }
 
-        public void SetAlarmTime(TimeSpan time) => _timeToAlarm = time;
-
-        public bool IsCanParseTime(string timeString) => _timeParser.IsMatch(timeString);
-
-        public TimeSpan ParseTime(string timeString)
+        public void SetAlarm(TimeSpan currenTime, TimeSpan alarmTime)
         {
-            var numbers = timeString.Split(TimeSplitter);
+            if (alarmTime <= currenTime)
+                return;
 
-            return new TimeSpan(
-                int.Parse(numbers[0]),
-                int.Parse(numbers[1]),
-                int.Parse(numbers[2]));
+            _logger.Log($"Alarm is set to: {alarmTime}");
+
+            _timeToAlarm = alarmTime;
+        }
+
+        public bool TryParseTime(string timeString, out TimeSpan time)
+        {
+            time = default;
+
+            try
+            {
+                var textNumbers = timeString.Split(TimeSplitter);
+                var parsedNumbers = new[]
+                {
+                    int.Parse(textNumbers[0]),
+                    int.Parse(textNumbers[1]),
+                    int.Parse(textNumbers[2]),
+                };
+
+                time = new TimeSpan(parsedNumbers[0], parsedNumbers[1], parsedNumbers[2]);
+
+                return _timeParser.IsMatch(timeString) &&
+                       timeString.Length == TimeNumbersLength &&
+                       parsedNumbers[0] < MaxHoursNumber &&
+                       parsedNumbers[1] < MaxHMinutesNumber &&
+                       parsedNumbers[2] < MaxSecondsNumber;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

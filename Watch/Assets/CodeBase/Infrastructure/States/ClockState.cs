@@ -40,8 +40,8 @@ namespace CodeBase.Infrastructure.States
 
         private void UpdateViews()
         {
-            _clockPresenter.UpdateDigitalClockView();
-            _clockPresenter.UpdateWallClockView();
+            _clockPresenter.UpdateDigitalClockView(_clockPresenter.GetCurrentTime());
+            _clockPresenter.UpdateWallClockView(_clockPresenter.GetCurrentTime());
         }
     }
 }

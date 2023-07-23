@@ -17,9 +17,9 @@ namespace CodeBase.Core.Clock
 
         public void UpdateModel(float deltaTime) => _model.Update(TimeSpan.FromSeconds(deltaTime));
 
-        public void UpdateDigitalClockView() => _sceneData.DigitalClockView.ShowTime(_model.GetCurrentTime());
+        public void UpdateDigitalClockView(TimeSpan time) => _sceneData.DigitalClockView.ShowTime(time);
 
-        public void UpdateWallClockView() => _sceneData.WallClockView.ShowTime(_model.GetCurrentTime());
+        public void UpdateWallClockView(TimeSpan time) => _sceneData.WallClockView.ShowTime(time);
 
         public TimeSpan GetCurrentTime() => _model.GetCurrentTime();
 

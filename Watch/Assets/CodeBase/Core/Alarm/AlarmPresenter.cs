@@ -10,6 +10,8 @@ namespace CodeBase.Core.Alarm
         private readonly ClockPresenter _clockPresenter;
         private readonly List<IAlarmView> _views;
         private readonly AlarmModel _model;
+
+        private TimeSpan _clockTime;
         private bool _isDigitalClockSelected;
 
         public AlarmPresenter(ClockPresenter clockPresenter, AlarmSceneData sceneData, AlarmModel model)
@@ -23,6 +25,8 @@ namespace CodeBase.Core.Alarm
         {
             foreach (var view in _views)
                 view.Initialize(this);
+
+            _clockTime = _clockPresenter.GetCurrentTime();
         }
 
         public void Dispose()
@@ -33,26 +37,22 @@ namespace CodeBase.Core.Alarm
 
         public void UpdateViews()
         {
-            _clockPresenter.UpdateWallClockView();
+            _clockPresenter.UpdateWallClockView(_clockTime);
 
             if (!_isDigitalClockSelected)
-                _clockPresenter.UpdateDigitalClockView();
+                _clockPresenter.UpdateDigitalClockView(_clockTime);
         }
 
         public void UpdateModel() => _model.Update(_clockPresenter.GetCurrentTime());
 
         public void SetDigitalClockSelected(bool isSelected) => _isDigitalClockSelected = isSelected;
 
-        public bool IsCanParseTime(string timeString) => _model.IsCanParseTime(timeString);
+        public bool TryParseTime(string timeString, out TimeSpan time) => _model.TryParseTime(timeString, out time);
 
-        public TimeSpan ParseTime(string timeString) => _model.ParseTime(timeString);
+        public TimeSpan GetClockTime() => _clockTime;
 
-        public TimeSpan GetCurrentTime() => _clockPresenter.GetCurrentTime();
+        public void SetClockTime(TimeSpan time) => _clockTime = time;
 
-        public void SetAlarmTime(TimeSpan time)
-        {
-            _clockPresenter.SetCurrentTime(time);
-            _model.SetAlarmTime(time);
-        }
+        public void SetAlarm() => _model.SetAlarm(_clockPresenter.GetCurrentTime(), _clockTime);
     }
 }

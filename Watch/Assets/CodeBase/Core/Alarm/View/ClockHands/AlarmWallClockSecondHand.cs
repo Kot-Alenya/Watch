@@ -6,12 +6,12 @@ namespace CodeBase.Core.Alarm.View.ClockHands
     {
         private const int SecondCircleAngle = 360 / 60;
 
-        private protected override void OnHandDrag(float deltaAngle)
+        private protected override TimeSpan CalculateTime(float deltaAngle)
         {
-            var savedTime = AlarmPresenter.GetCurrentTime();
+            var savedTime = AlarmPresenter.GetClockTime();
             var offset = TimeSpan.FromSeconds(deltaAngle / SecondCircleAngle);
 
-            AlarmPresenter.SetAlarmTime(savedTime + offset);
+            return savedTime + offset;
         }
     }
 }

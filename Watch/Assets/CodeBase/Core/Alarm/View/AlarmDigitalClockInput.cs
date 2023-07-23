@@ -32,12 +32,16 @@ namespace CodeBase.Core.Alarm.View
 
         private void OnSelect(string text) => _presenter.SetDigitalClockSelected(true);
 
-        private void OnDeselect(string text) => _presenter.SetDigitalClockSelected(false);
+        private void OnDeselect(string text)
+        {
+            _presenter.SetAlarm();
+            _presenter.SetDigitalClockSelected(false);
+        }
 
         private void OnValueChanged(string text)
         {
-            if (_presenter.IsCanParseTime(text))
-                _presenter.SetAlarmTime(_presenter.ParseTime(text));
+            if (_presenter.TryParseTime(text, out var time))
+                _presenter.SetClockTime(time);
         }
     }
 }
